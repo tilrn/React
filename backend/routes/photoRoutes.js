@@ -20,10 +20,14 @@ router.get('/', photoController.list);
 //router.get('/publish', requiresLogin, photoController.publish);
 router.get('/:id', photoController.show);
 
+//router.get("/comments/:id", photoController.showComments);
+
 router.post('/', requiresLogin, upload.single('image'), photoController.create);
 
 router.put('/:id', photoController.update);
 
 router.delete('/:id', photoController.remove);
+
+router.put("/:id", requiresLogin, photoController.updateLikes);
 
 module.exports = router;
