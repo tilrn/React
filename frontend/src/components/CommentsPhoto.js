@@ -3,46 +3,66 @@ import axios from "axios";
 function CommentsPhoto() {
     const [id, setId] = useState(sessionStorage.getItem('image'))
     const [Image, setImage] = useState([]);
+    const [Comments, setComments] = useState([]);
+    const [Users, setUsers] = useState([]);
+
+    const [comment, setComment] = useState("");   
+    const [refresh, setRefresh] = useState("");
     const [text, setText] = useState("");
 
-    useEffect(() => console.log(text), [text]);
+    //useEffect(() => console.log(text), [text]);
 
     useEffect(() => {
         getImage()
     }, [])
 
-    function publishComment() {
-        let inputText = document.getElementById("inputText");
+   //function publishComment() {
+   //    let inputText = document.getElementById("inputText");
 
-    }
-    async function publishComment(e) {
-        e.preventDefault();
-        const res = await fetch("http://localhost:3001/comments/", {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: text,
-                postedBy: "123",
-                postedTo: id
-            })
-        });
+   //}
 
-        //     'message': String,
-        // 'postedBy': {
-        // 	type: Schema.Types.ObjectId,
-        // 	ref: 'users'
-        // },
-        // 'postedTo': 
+   async function handleComment(e) {
+    e.preventDefault();
+    const res = await fetch("http://localhost:3001/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+            messagee: text,
+            postedTo: id
+        }),
+    });
 
-        const data = await res.json();
-        if (data._id !== undefined) {
-            window.location.href = "/";
-        }
-        else {
-            console.log("NOT WORKING");
-        }
-    }
+    const data = await res.json();
+    setRefresh(refresh + "1");
+
+   //console.log(data)
+    
+}
+
+useEffect(
+    function () {
+        const getComments = async function () {
+            const res = await fetch(
+                "http://localhost:3001/comments/photo/" +
+                    id
+            );
+            const data = await res.json();
+            setComments(data);
+        };
+        getComments();
+    },
+
+    [refresh]
+
+
+
+);
+
+
+
+
+   
 
 
     async function getImage() {
@@ -54,7 +74,7 @@ function CommentsPhoto() {
         });
         const data = await res.json();
         if (data._id !== undefined) {
-            console.log(data);
+            //console.log(data);
             setImage(data);
         } else {
 
@@ -67,10 +87,21 @@ function CommentsPhoto() {
                     <img className="card-img" src={"http://localhost:3001/" + Image.path} alt={Image.name} id={Image._id} />
                 </div>
             }
-            <form onSubmit={publishComment}>
-                <input id="inputText" type='text' value={text} onChange={(e) => (setText(e.target.value))}></input>
-                <button type='submit' onClick={publishComment} >Submit comment</button>
+            <form onSubmit={handleComment}>
+                <input id="inputText" type='text' name='text' value={text} onChange={(e) => (setText(e.target.value))}></input>
+                <button type='submit'  >Submit comment</button>
             </form>
+
+            <div>
+                {Comments &&
+                    Comments.map((comment) => (
+                        <div key={comment._id}>
+                            {comment.postedBy.username}: {comment.message}
+                        </div>
+                    ))}
+            </div>
+
+
         </div>
     );
 }

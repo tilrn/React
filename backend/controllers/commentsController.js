@@ -1,7 +1,7 @@
 var CommentsModel = require("../models/commentsModel.js");
-
+const User = require("../models/userModel.js");
 var bcrypt = require("bcrypt");
-var config = require("../config/auth.config.js");
+//var config = require("../config/auth.config.js");
 /**
  * usersController.js
  *
@@ -20,8 +20,8 @@ module.exports = {
                 });
             }
             //console.log(comments)
-            return res.render("comments", comments);
-        });
+            return res.json(comments);
+        }); 
     },
 
     /**
@@ -33,30 +33,72 @@ module.exports = {
         CommentsModel.find({ _id: id }, function (err, user) {
             if (err) {
                 return res.status(500).json({
-                    message: "Error when getting users.",
+                    message: "Error when getting comments.",
                     error: err,
                 });
             }
 
             if (!user) {
                 return res.status(404).json({
-                    message: "No such users",
+                    message: "No such comments",
                 });
             }
-            user.password = "";
+            
             return res.json(user);
+        });
+    },
+
+    showCommentsOld: function (req, res) {
+        console.log(req.params.id, " id")
+        var photo_id = req.params.id;
+        CommentsModel.find({ postedTo: photo_id })  
+            .exec(function (err, comments) {
+                console.log("shoComments function running")
+
+                if (err) {
+                    return res.status(500).json({
+                        message: "Error when getting comments.",
+                        error: err,
+                    });
+                }
+                if (!comments) {
+                    return res.status(404).json({
+                        message: "No such photo",
+                    });
+                }
+                //return res.render('photo/list', data);
+                return res.json(comments);
+            });
+    },
+
+    showComments: function(req , res) {
+        CommentsModel.find({postedTo: req.params.id}).populate("postedBy").exec(function (err, comments) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting comments.',
+                    error: err
+                });
+            }
+            if (!comments) {
+                return res.status(404).json({
+                    message: 'No such comments'
+                });
+            }
+            return res.status(200).json(comments);
         });
     },
 
     /**
      * usersController.create()
      */
+
+
+
     create: function (req, res) {
-        console.log("ke")
-        console.log(req.body.message, " To je message")
+        console.log(req.body.messagee, " To je message")
         console.log(req.session.userId, " To je idUser")
         var comment = new CommentsModel({
-            message: req.body.message,
+            message: req.body.messagee,
             postedBy: req.session.userId,
             postedTo: req.body.postedTo
         });
@@ -64,7 +106,7 @@ module.exports = {
         comment.save(function (err, comments) {
             if (err) {
                 return res.status(500).json({
-                    message: "Error when creating users",
+                    message: "Error when creating comments",
                     error: err,
                 });
             }
@@ -72,6 +114,7 @@ module.exports = {
             return res.status(201).json(comments);
         });
     },
+    
 
     /**
      * usersController.update()
@@ -81,14 +124,14 @@ module.exports = {
         CommentsModel.findOne({ _id: id }, function (err, users) {
             if (err) {
                 return res.status(500).json({
-                    message: "Error when getting users",
+                    message: "Error when getting comments",
                     error: err,
                 });
             }
 
             if (!users) {
                 return res.status(404).json({
-                    message: "No such users",
+                    message: "No such comments",
                 });
             }
 
@@ -103,7 +146,7 @@ module.exports = {
             users.save(function (err, users) {
                 if (err) {
                     return res.status(500).json({
-                        message: "Error when updating users.",
+                        message: "Error when updating comments.",
                         error: err,
                     });
                 }
@@ -122,7 +165,7 @@ module.exports = {
         CommentsModel.findByIdAndRemove(id, function (err, users) {
             if (err) {
                 return res.status(500).json({
-                    message: "Error when deleting the users.",
+                    message: "Error when deleting the comments.",
                     error: err,
                 });
             }
@@ -139,14 +182,14 @@ module.exports = {
                 function (err, user) {
                     if (err) {
                         return res.status(500).json({
-                            message: "Error getting user.",
+                            message: "Error getting comments.",
                             error: err,
                         });
                     }
 
                     if (!user) {
                         return res.status(404).json({
-                            message: "User not found.",
+                            message: "comments not found.",
                         });
                     }
 

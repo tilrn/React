@@ -23,6 +23,26 @@ module.exports = {
         });
     },
 
+    showUsername: function (req, res) {
+        var id = req.params.id;
+        UserModel.findOne({ _id: id }, function (err, username) {
+            if (err) {
+                return res.status(500).json({
+                    message: "Error when getting comments",
+                    error: err,
+                });
+            }
+
+            if (!username) {
+                return res.status(404).json({
+                    message: "No such username",
+                });
+            }
+            return res.json(username)
+           
+        });
+    },
+
     /**
      * userController.show()
      */

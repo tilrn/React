@@ -1,5 +1,5 @@
 var PhotoModel = require('../models/photoModel.js');
-
+var CommentModel = require("../models/commentsModel.js");
 /**
  * photoController.js
  *
@@ -50,6 +50,10 @@ module.exports = {
             return res.json(photo);
         });
     },
+//            
+
+    
+
 
     /**
      * photoController.create()
@@ -75,6 +79,43 @@ module.exports = {
             //return res.redirect('/photos');
         });
     },
+
+    updateLikes: function (req, res) {
+        var id = req.params.id;
+
+        PhotoModel.findOne({ _id: id }, function (err, photo) {
+            if (err) {
+                return res.status(500).json({
+                    message: "Error when getting photo",
+                    error: err,
+                });
+            }
+
+            if (!photo) {
+                return res.status(404).json({
+                    message: "No such photo",
+                });
+            }
+
+            if (!photo.likes.includes(req.session.userId)) {
+                photo.likes.push(req.session.userId);
+            } else {
+                photo.likes.splice(photo.likes.indexOf(req.session.userId), 1);
+            }
+
+            photo.save(function (err, photo) {
+                if (err) {
+                    return res.status(500).json({
+                        message: "Error when updating photo.",
+                        error: err,
+                    });
+                }
+
+                return res.json();
+            });
+        });
+    },
+
 
     /**
      * photoController.update()
@@ -114,6 +155,8 @@ module.exports = {
             });
         });
     },
+
+
 
     /**
      * photoController.remove()

@@ -7,6 +7,9 @@
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.13.3",
     "axios": "^1.4.0",
     "bcrypt": "^5.0.1",
     "connect-mongo": "^4.6.0",

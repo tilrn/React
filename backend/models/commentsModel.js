@@ -4,14 +4,17 @@ var Schema = mongoose.Schema;
 var commentsSchema = new Schema({
 	'message': String,
 	'postedBy': {
-		type: Schema.Types.ObjectId,
+		type: mongoose.Types.ObjectId,
 		ref: 'users'
 	},
 	'postedTo': {
-		type: Schema.Types.ObjectId,
+		type: mongoose.Types.ObjectId,
 		ref: 'photos'
-	}
-});
+	},
+},
+{ timestamps: true }
+
+);
 
 
 
